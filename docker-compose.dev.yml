@@ -2,26 +2,26 @@ version: '3.8'
 
 services:
   # Frontend Development Service
-  frontend-dev:
-    build:
-      context: ./UserAccessManager
-      dockerfile: Dockerfile.dev
-    container_name: fertiwell-frontend-dev
-    ports:
-      - "5173:5173"
-    environment:
-      - NODE_ENV=development
-      - VITE_API_URL=http://localhost:5000
-      - CHOKIDAR_USEPOLLING=true
-    volumes:
-      - ./UserAccessManager:/app
-      - /app/node_modules
-    networks:
-      - fertiwell-network
-    depends_on:
-      - backend-dev
-    restart: unless-stopped
-    command: npm run frontend
+  # frontend-dev:
+  #   build:
+  #     context: ./UserAccessManager
+  #     dockerfile: Dockerfile.dev
+  #   container_name: fertiwell-frontend-dev
+  #   ports:
+  #     - "5173:5173"
+  #   environment:
+  #     - NODE_ENV=development
+  #     - VITE_API_URL=http://localhost:5000
+  #     - CHOKIDAR_USEPOLLING=true
+  #   volumes:
+  #     - ./UserAccessManager:/app
+  #     - /app/node_modules
+  #   networks:
+  #     - fertiwell-network
+  #   depends_on:
+  #     - backend-dev
+  #   restart: unless-stopped
+  #   command: npm run frontend
 
   # Backend Development Service
   backend-dev:

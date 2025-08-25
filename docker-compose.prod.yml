@@ -2,21 +2,21 @@ version: '3.8'
 
 services:
   # Frontend Production Service
-  frontend:
-    build:
-      context: ./UserAccessManager
-      dockerfile: Dockerfile.prod
-    container_name: fertiwell-frontend-prod
-    ports:
-      - "80:80"
-    environment:
-      - NODE_ENV=production
-      - VITE_API_URL=http://localhost:5000
-    networks:
-      - fertiwell-network
-    depends_on:
-      - backend
-    restart: unless-stopped
+  # frontend:
+  #   build:
+  #     context: ./UserAccessManager
+  #     dockerfile: Dockerfile.prod
+  #   container_name: fertiwell-frontend-prod
+  #   ports:
+  #     - "80:80"
+  #   environment:
+  #     - NODE_ENV=production
+  #     - VITE_API_URL=http://localhost:5000
+  #   networks:
+  #     - fertiwell-network
+  #   depends_on:
+  #     - backend
+  #   restart: unless-stopped
 
   # Backend Production Service
   backend:
