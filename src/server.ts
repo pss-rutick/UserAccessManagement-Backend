@@ -16,17 +16,30 @@ import dashboardRouter from "./routes/dashboard";
 const app = express();
 
 // Middlewares
-app.use(cors());
+app.use(cors({
+  origin: process.env.CORS_ORIGIN || "*",
+  credentials: true
+}));
 app.use(bodyParser.json());
 
 // Health check endpoint
 app.get("/health", async (req: Request, res: Response) => {
   try {
-    // Quick Firestore check
     await db.listCollections();
-    res.status(200).json({ status: "ok", firebase: true });
+    res.status(200).json({ 
+      status: "ok", 
+      firebase: true,
+      timestamp: new Date().toISOString(),
+      environment: process.env.NODE_ENV || 'development'
+    });
   } catch (error) {
-    res.status(500).json({ status: "error", firebase: false, error });
+    console.error("Health check failed:", error);
+    res.status(500).json({ 
+      status: "error", 
+      firebase: false, 
+      error: error instanceof Error ? error.message : 'Unknown error',
+      timestamp: new Date().toISOString()
+    });
   }
 });
 
@@ -40,12 +53,22 @@ app.use("/api/notifications", notificationsRouter);
 // Global error handler
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   console.error("🔥 Server Error:", err.message);
-  res.status(500).json({ error: err.message });
+  res.status(500).json({ 
+    error: process.env.NODE_ENV === 'production' 
+      ? 'Internal server error' 
+      : err.message,
+    timestamp: new Date().toISOString()
+  });
 });
 
 const PORT = process.env.PORT || 5000;
+
 app.listen(PORT, () => {
   console.log(`🚀 Boss Server running on http://localhost:${PORT}`);
+  console.log(`📦 Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`🔥 Firebase Project: ${process.env.FIREBASE_PROJECT_ID || 'Not configured'}`);
+  console.log(`🌐 CORS Origin: ${process.env.CORS_ORIGIN || '*'}`);
 });
 
 export default app;
+

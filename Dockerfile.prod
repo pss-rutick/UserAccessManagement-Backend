@@ -1,17 +1,13 @@
 # Production Backend Dockerfile
-FROM node:18-alpine
+FROM node:20-alpine AS builder
 
-# Install curl for health checks
-RUN apk add --no-cache curl
-
-# Set working directory
 WORKDIR /app
 
 # Copy package files
 COPY package*.json ./
 
-# Install only production dependencies
-RUN npm ci --only=production
+# Install all dependencies
+RUN npm ci
 
 # Copy source code
 COPY . .
@@ -19,11 +15,22 @@ COPY . .
 # Build TypeScript
 RUN npm run build
 
-# Remove dev dependencies and source files to reduce image size
-RUN npm prune --production && \
-    rm -rf src/ && \
-    rm -rf node_modules/@types/ && \
-    rm tsconfig.json
+# Production stage
+FROM node:20-alpine AS production
+
+# Install curl for health checks
+RUN apk add --no-cache curl
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install only production dependencies
+RUN npm ci --only=production && npm cache clean --force
+
+# Copy built application from builder stage
+COPY --from=builder /app/dist ./dist
 
 # Create non-root user for security
 RUN addgroup -g 1001 -S nodejs && \
@@ -42,3 +49,4 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
 
 # Start the application
 CMD ["node", "dist/server.js"]
+
