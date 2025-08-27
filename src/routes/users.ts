@@ -1,12 +1,12 @@
 // C:\PSS\UAM-backend\src\routes\users.ts
 import { Router } from "express";
 import { createUserInFirebase, getAllUsers, MobileUser } from "../services/userService";
-import { db } from "../firebase";
+import { requireFirebase, getFirebaseDb } from "../middleware/firebase";
 
 const router = Router();
 
 // Get all users
-router.get("/", async (req, res) => {
+router.get("/", requireFirebase, async (req, res) => {
   try {
     const search = req.query.search as string;
     const users = await getAllUsers(search);
@@ -22,9 +22,10 @@ router.get("/", async (req, res) => {
 });
 
 // Get user by ID
-router.get("/:id", async (req, res) => {
+router.get("/:id", requireFirebase, async (req, res) => {
   try {
     const { id } = req.params;
+    const db = getFirebaseDb();
     const userDoc = await db.collection("users").doc(id).get();
 
     if (!userDoc.exists) {
@@ -46,7 +47,7 @@ router.get("/:id", async (req, res) => {
 });
 
 // Create user
-router.post("/", async (req, res) => {
+router.post("/", requireFirebase, async (req, res) => {
   try {
     const { name, email, status, accessLevel } = req.body;
     if (!name || !email) {
@@ -62,10 +63,11 @@ router.post("/", async (req, res) => {
 });
 
 // Update user (Admin operation)
-router.put("/:id", async (req, res) => {
+router.put("/:id", requireFirebase, async (req, res) => {
   try {
     const { id } = req.params;
     const updateData = req.body;
+    const db = getFirebaseDb();
 
     // Check if user exists first
     const userDoc = await db.collection("users").doc(id).get();
@@ -100,7 +102,7 @@ router.put("/:id", async (req, res) => {
 });
 
 // Toggle user status (Admin operation)
-router.patch("/:id/status", async (req, res) => {
+router.patch("/:id/status", requireFirebase, async (req, res) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
@@ -109,6 +111,7 @@ router.patch("/:id/status", async (req, res) => {
       return res.status(400).json({ error: "Valid status (active/inactive) is required" });
     }
 
+    const db = getFirebaseDb();
     // Check if user exists
     const userDoc = await db.collection("users").doc(id).get();
     if (!userDoc.exists) {
@@ -139,9 +142,10 @@ router.patch("/:id/status", async (req, res) => {
 });
 
 // Delete user (Admin operation)
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", requireFirebase, async (req, res) => {
   try {
     const { id } = req.params;
+    const db = getFirebaseDb();
 
     // Check if user exists first
     const userDoc = await db.collection("users").doc(id).get();

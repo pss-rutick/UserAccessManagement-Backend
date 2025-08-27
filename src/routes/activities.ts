@@ -1,10 +1,11 @@
 import { Router } from "express";
-import { db } from "../firebase";
+import { requireFirebase, getFirebaseDb } from "../middleware/firebase";
 
 const router = Router();
 
-router.get("/", async (req, res) => {
+router.get("/", requireFirebase, async (req, res) => {
   try {
+    const db = getFirebaseDb();
     const snapshot = await db
       .collection("activities")
       .orderBy("createdAt", "desc")

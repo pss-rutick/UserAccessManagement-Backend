@@ -1,11 +1,12 @@
 import { Router } from "express";
-import { db } from "../firebase";
+import { requireFirebase, getFirebaseDb } from "../middleware/firebase";
 
 const router = Router();
 
-router.post("/", async (req, res) => {
+router.post("/", requireFirebase, async (req, res) => {
   try {
     const { message, userId } = req.body;
+    const db = getFirebaseDb();
 
     const ref = await db.collection("activities").add({
       message,

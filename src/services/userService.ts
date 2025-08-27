@@ -1,5 +1,5 @@
 //C:\PSS\UAM-backend\src\services\userService.ts
-import { db } from "../firebase";
+import { getFirebaseDb } from "../middleware/firebase";
 
 export interface MobileUser {
   name: string;
@@ -18,6 +18,7 @@ export interface MobileUser {
 // Create a new user
 export const createUserInFirebase = async (user: MobileUser) => {
   try {
+    const db = getFirebaseDb();
     const newUser = {
       ...user,
       currentStage: user.currentStage || 1,
@@ -38,6 +39,7 @@ export const createUserInFirebase = async (user: MobileUser) => {
 // Get all users
 export const getAllUsers = async (search?: string): Promise<MobileUser[]> => {
   try {
+    const db = getFirebaseDb();
     const snapshot = await db.collection("users").get();
 
     let users = snapshot.docs.map((doc) => {

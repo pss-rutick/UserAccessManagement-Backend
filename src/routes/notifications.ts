@@ -1,10 +1,10 @@
 import { Router } from "express";
-import { db } from "../firebase";
+import { requireFirebase, getFirebaseDb } from "../middleware/firebase";
 
 const router = Router();
 
 // POST /api/notifications
-router.post("/", async (req, res) => {
+router.post("/", requireFirebase, async (req, res) => {
   try {
     const data = req.body;
 
@@ -12,6 +12,7 @@ router.post("/", async (req, res) => {
       return res.status(400).json({ error: "message and userId are required" });
     }
 
+    const db = getFirebaseDb();
     const ref = await db.collection("notifications").add({
       ...data,
       createdAt: new Date(),

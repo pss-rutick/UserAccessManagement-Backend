@@ -1,12 +1,13 @@
 // Dashboard statistics routes
 import { Router } from "express";
-import { db } from "../firebase";
+import { requireFirebase, getFirebaseDb } from "../middleware/firebase";
 
 const router = Router();
 
 // Get dashboard statistics
-router.get("/stats", async (req, res) => {
+router.get("/stats", requireFirebase, async (req, res) => {
   try {
+    const db = getFirebaseDb();
     const [usersSnapshot, sessionsSnapshot] = await Promise.all([
       db.collection("users").get(),
       db.collection("sessions").get() // We'll create this collection for session tracking
@@ -86,8 +87,9 @@ router.get("/stats", async (req, res) => {
 });
 
 // Get recent users (last 10 users)
-router.get("/recent-users", async (req, res) => {
+router.get("/recent-users", requireFirebase, async (req, res) => {
   try {
+    const db = getFirebaseDb();
     const snapshot = await db.collection("users")
       .orderBy("created", "desc")
       .limit(10)
