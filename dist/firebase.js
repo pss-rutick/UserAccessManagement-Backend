@@ -39,25 +39,48 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.storage = exports.auth = exports.db = void 0;
 // src/firebase.ts
 const admin = __importStar(require("firebase-admin"));
-// Load service account key (JSON with project_id, private_key, client_email, etc.)
-const serviceAccountKey_json_1 = __importDefault(require("../serviceAccountKey.json"));
+const path_1 = __importDefault(require("path"));
+const fs_1 = __importDefault(require("fs"));
 // Initialize Firebase only once
 if (!admin.apps.length) {
-    admin.initializeApp({
-        credential: admin.credential.cert(serviceAccountKey_json_1.default),
-        storageBucket: `${serviceAccountKey_json_1.default.project_id}.appspot.com`, // keep snake_case for JSON
-    });
+    const envVarsAvailable = process.env.FIREBASE_PROJECT_ID && process.env.FIREBASE_PRIVATE_KEY && process.env.FIREBASE_CLIENT_EMAIL;
+    if (envVarsAvailable && !process.env.FIREBASE_PRIVATE_KEY?.startsWith("replace-with-")) {
+        // Use environment variables
+        const serviceAccount = {
+            type: "service_account",
+            project_id: process.env.FIREBASE_PROJECT_ID,
+            private_key_id: process.env.FIREBASE_PRIVATE_KEY_ID,
+            private_key: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+            client_email: process.env.FIREBASE_CLIENT_EMAIL,
+            client_id: process.env.FIREBASE_CLIENT_ID,
+            auth_uri: "https://accounts.google.com/o/oauth2/auth",
+            token_uri: "https://oauth2.googleapis.com/token",
+            auth_provider_x509_cert_url: "https://www.googleapis.com/oauth2/v1/certs",
+            client_x509_cert_url: process.env.FIREBASE_CLIENT_X509_CERT_URL
+        };
+        admin.initializeApp({
+            credential: admin.credential.cert(serviceAccount),
+            storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+            databaseURL: process.env.FIREBASE_DATABASE_URL,
+        });
+        console.log("✅ Firebase initialized using environment variables.");
+    }
+    else {
+        // Try loading local serviceAccountKey.json
+        const serviceAccountPath = path_1.default.resolve(__dirname, "./config/serviceAccountKey.json");
+        if (fs_1.default.existsSync(serviceAccountPath)) {
+            const serviceAccount = require(serviceAccountPath);
+            admin.initializeApp({
+                credential: admin.credential.cert(serviceAccount),
+            });
+            console.log("✅ Firebase initialized using local serviceAccountKey.json.");
+        }
+        else {
+            console.warn("⚠️ Firebase Admin SDK not initialized: missing env vars and no serviceAccountKey.json found.");
+        }
+    }
 }
-// Export Firebase services
-exports.db = admin.firestore();
-exports.auth = admin.auth();
-exports.storage = admin.storage().bucket();
-// const firebaseConfig = {
-//   apiKey: "AIzaSyAHnY_DkFNlW-Tf5s3-7gm4CiRmTZFeOxc",
-//   authDomain: "fertiwell-ba75e.firebaseapp.com",
-//   projectId: "fertiwell-ba75e",
-//   storageBucket: "fertiwell-ba75e.firebasestorage.app",
-//   messagingSenderId: "246698056314",
-//   appId: "1:246698056314:android:e8b8c8f8f8f8f8f8f8f8f8", // Replace with actual
-//   measurementId: "G-1234567890",
-// };
+exports.db = admin.apps.length > 0 ? admin.firestore() : null;
+exports.auth = admin.apps.length > 0 ? admin.auth() : null;
+exports.storage = admin.apps.length > 0 ? admin.storage().bucket() : null;
+exports.default = admin;

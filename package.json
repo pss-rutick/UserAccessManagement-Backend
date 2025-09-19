@@ -7,7 +7,8 @@
     "dev": "ts-node src/server.ts",
     "build": "tsc",
     "test-firebase": "node check-firebase.js",
-    "setup-data": "node setup-test-data.js"
+    "setup-data": "node setup-test-data.js",
+    "set-admins": "ts-node src/scripts/setAdmin.ts"
   },
   "dependencies": {
     "body-parser": "^2.2.0",

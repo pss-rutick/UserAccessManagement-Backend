@@ -1,12 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
-const firebase_1 = require("../firebase");
+const firebase_1 = require("../middleware/firebase");
 const router = (0, express_1.Router)();
-router.post("/", async (req, res) => {
+router.post("/", firebase_1.requireFirebase, async (req, res) => {
     try {
         const { message, userId } = req.body;
-        const ref = await firebase_1.db.collection("activities").add({
+        const db = (0, firebase_1.getFirebaseDb)();
+        const ref = await db.collection("activities").add({
             message,
             userId,
             createdAt: new Date(),

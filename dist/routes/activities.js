@@ -1,11 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
-const firebase_1 = require("../firebase");
+const firebase_1 = require("../middleware/firebase");
 const router = (0, express_1.Router)();
-router.get("/", async (req, res) => {
+router.get("/", firebase_1.requireFirebase, async (req, res) => {
     try {
-        const snapshot = await firebase_1.db
+        const db = (0, firebase_1.getFirebaseDb)();
+        const snapshot = await db
             .collection("activities")
             .orderBy("createdAt", "desc")
             .limit(10)

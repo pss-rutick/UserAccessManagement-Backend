@@ -1,3 +1,4 @@
+// C:\PSS\UAM-backend\src\server.ts
 import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
@@ -12,14 +13,34 @@ import usersRouter from "./routes/users";
 import activitiesRouter from "./routes/activities";
 import notificationsRouter from "./routes/notifications";
 import dashboardRouter from "./routes/dashboard";
+import authRouter from "./routes/auth";
+import adminsRouter from "./routes/admins";
+import listUsersRouter from './routes/listUsers';
+import userProfileRoute from "./routes/userProfile";
+import adminActionsRoute from "./routes/adminActions";
+import profileRoutes from './routes/PersonalDetailsContext';
+import dashboardRoutes from './routes/dashboardRoutes';
 
 const app = express();
 
 // ---------------------- Middlewares ----------------------
+const defaultOrigins = ["http://localhost:5173"];
+const allowedOrigins = (process.env.CORS_ORIGINS || "")
+  .split(",")
+  .map((s) => s.trim())
+  .filter(Boolean);
+const origins = allowedOrigins.length ? allowedOrigins : defaultOrigins;
+
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN || "*",
-    credentials: true,
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      if (origins.includes(origin)) return callback(null, true);
+      const isLocalhost = /^https?:\/\/(localhost|127\.0\.0\.1)(:\\d+)?$/.test(origin);
+      if (isLocalhost) return callback(null, true);
+      return callback(new Error("Not allowed by CORS"));
+    },
+    credentials: false,
   })
 );
 app.use(bodyParser.json());
@@ -51,11 +72,18 @@ app.get("/health", async (req: Request, res: Response) => {
 });
 
 // ---------------------- API Routes ----------------------
+app.use("/api", authRouter);
 app.use("/api/dashboard", dashboardRouter);
 app.use("/api/stats", statsRouter);
 app.use("/api/mobile-users", usersRouter);
 app.use("/api/activities", activitiesRouter);
 app.use("/api/notifications", notificationsRouter);
+app.use("/api/admins", adminsRouter);
+app.use("/api", listUsersRouter);
+app.use('/api', profileRoutes);
+app.use("/api", userProfileRoute); 
+app.use("/api", adminActionsRoute);
+app.use('/api', dashboardRoutes);
 
 // ---------------------- Global Error Handler ----------------------
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
@@ -85,7 +113,7 @@ const startServer = (port: number) => {
         process.env.FIREBASE_PROJECT_ID || "Not configured"
       }`
     );
-    console.log(`🌐 CORS Origin: ${process.env.CORS_ORIGIN || "*"}`);
+    console.log(`🌐 CORS Origins: ${origins.join(", ")}`);
   });
 
   server.on("error", (err: NodeJS.ErrnoException) => {

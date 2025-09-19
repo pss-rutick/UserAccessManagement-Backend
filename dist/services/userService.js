@@ -2,16 +2,20 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getAllUsers = exports.createUserInFirebase = void 0;
 //C:\PSS\UAM-backend\src\services\userService.ts
-const firebase_1 = require("../firebase");
+const firebase_1 = require("../middleware/firebase");
 // Create a new user
 const createUserInFirebase = async (user) => {
     try {
+        const db = (0, firebase_1.getFirebaseDb)();
         const newUser = {
             ...user,
+            currentStage: user.currentStage || 1,
+            score: user.score || 0,
             created: new Date(),
             lastActive: new Date(),
+            joinedAt: new Date(),
         };
-        const docRef = await firebase_1.db.collection("users").add(newUser);
+        const docRef = await db.collection("users").add(newUser);
         return { id: docRef.id, ...newUser };
     }
     catch (err) {
@@ -23,7 +27,8 @@ exports.createUserInFirebase = createUserInFirebase;
 // Get all users
 const getAllUsers = async (search) => {
     try {
-        const snapshot = await firebase_1.db.collection("users").get();
+        const db = (0, firebase_1.getFirebaseDb)();
+        const snapshot = await db.collection("users").get();
         let users = snapshot.docs.map((doc) => {
             const data = doc.data();
             return {
@@ -32,9 +37,12 @@ const getAllUsers = async (search) => {
                 email: data.email || "",
                 status: data.status || "active",
                 accessLevel: data.accessLevel || "standard",
+                currentStage: data.currentStage || 1,
+                score: data.score || 0,
                 uid: data.uid,
                 created: data.created,
                 lastActive: data.lastActive,
+                joinedAt: data.joinedAt || data.created, // fallback to created if joinedAt doesn't exist
             };
         });
         if (search) {
