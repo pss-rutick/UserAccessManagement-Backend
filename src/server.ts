@@ -16,9 +16,9 @@ import dashboardRouter from "./routes/dashboard";
 import authRouter from "./routes/auth";
 import adminsRouter from "./routes/admins";
 import listUsersRouter from './routes/listUsers';
-import userProfileRoute from "./routes/userProfile";
+import userProfileRoute from "./routes/user-profile/userProfile";
 import adminActionsRoute from "./routes/adminActions";
-import profileRoutes from './routes/PersonalDetailsContext';
+import profileRoutes from './routes/user-profile/PersonalDetailsContent';
 import dashboardRoutes from './routes/dashboardRoutes';
 
 const app = express();
