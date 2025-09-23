@@ -149,6 +149,9 @@ router.get('/user/:uid', async (req, res) => {
   }
 
   try {
+    if (!db) {
+      throw new Error("Firebase db is not initialized.");
+    }
     const userDocRef = db.collection('users').doc(uid);
     const userDoc = await userDocRef.get();
 
@@ -158,11 +161,9 @@ router.get('/user/:uid', async (req, res) => {
 
     const userData = userDoc.data();
     
-    // Ensure that the fullName field exists before sending
     if (userData && userData.fullName) {
       res.status(200).json({ fullName: userData.fullName });
     } else {
-      // You can also send the full user data if needed
       res.status(200).json(userData);
     }
 

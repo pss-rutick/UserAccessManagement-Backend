@@ -8,14 +8,15 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies
-RUN npm ci --only=production
+#RUN npm ci --only=production
+RUN npm ci
 
 # Copy source code
 COPY . .
 
 # Copy Firebase service account key
 COPY serviceAccountKey.json ./
-
+    
 # Build TypeScript
 RUN npm run build
 
