@@ -1,31 +1,28 @@
-# Backend Dockerfile
-FROM node:18-alpine
-
-# Set working directory
+# --- builder ---
+FROM node:18-alpine AS builder
 WORKDIR /app
-
-# Copy package files
 COPY package*.json ./
-
-# Install dependencies
-#RUN npm ci --only=production
 RUN npm ci
+COPY tsconfig.json ./
+COPY src ./src
+# add any schema or non-TS runtime assets if needed:
+# COPY serviceAccountKey.json ./  # not needed in builder for compile
+RUN npx tsc
 
-# Copy source code
-COPY . .
-
-# Copy Firebase service account key
-COPY serviceAccountKey.json ./
-    
-# Build TypeScript
-RUN npm run build
-
-# Expose port
+# --- runner ---
+FROM node:18-alpine AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+COPY package*.json ./
+RUN npm ci --omit=dev
+# Only copy built artifacts
+COPY --from=builder /app/dist ./dist
+# Copy runtime assets (env, service account, etc.)
+COPY serviceAccountKey.json ./serviceAccountKey.json
 EXPOSE 5000
-
-# Health check
+# Install curl for HEALTHCHECK on Alpine
+RUN apk add --no-cache curl
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD curl -f http://localhost:5000/health || exit 1
+  CMD curl -fsS http://localhost:5000/health || exit 1
+CMD ["node", "dist/server.js"]
 
-# Start the application
-CMD ["npm", "start"]

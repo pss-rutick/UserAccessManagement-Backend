@@ -1,27 +1,6 @@
-version: '3.8'
+version: "3.8"
 
 services:
-  # Frontend Service
-  # frontend:
-    # build:
-    #   context: ./UserAccessManager
-    #   dockerfile: Dockerfile
-    # container_name: fertiwell-frontend
-    # ports:
-    #   - "5173:5173"
-    # environment:
-    #   - NODE_ENV=development
-    #   - VITE_API_URL=http://localhost:5000
-    # volumes:
-    #   - ./UserAccessManager:/app
-    #   - /app/node_modules
-    # networks:
-    #   - fertiwell-network
-    # depends_on:
-    #   - backend
-    # restart: unless-stopped
-
-  # Backend Service
   backend:
     build:
       context: .
@@ -29,13 +8,14 @@ services:
     container_name: fertiwell-backend
     ports:
       - "5000:5000"
+    # Load all variables from .env at project root
+    env_file:
+      - .env
+    # Explicit runtime overrides (keep minimal)
     environment:
-      - NODE_ENV=development
+      - NODE_ENV=production
       - PORT=5000
-    volumes:
-      - .:/app
-      - /app/node_modules
-      - ./serviceAccountKey.json:/app/serviceAccountKey.json:ro
+    # No bind mounts in prod to avoid masking dist
     networks:
       - fertiwell-network
     restart: unless-stopped
@@ -44,6 +24,3 @@ networks:
   fertiwell-network:
     driver: bridge
 
-volumes:
-  backend_node_modules:
-  # frontend_node_modules:
