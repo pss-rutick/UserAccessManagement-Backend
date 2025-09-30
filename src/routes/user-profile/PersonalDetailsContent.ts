@@ -141,6 +141,8 @@
 
 // export default router;
 
+
+// src/routes/userProfile.ts
 import express, { Request, Response } from "express";
 import admin from "firebase-admin";
 
@@ -183,11 +185,13 @@ router.get("/user-profile/:uid", async (req: Request, res: Response) => {
         dateOfBirth: sectionProfile.dateOfBirth || 'N/A',
         dateOfJoining: sectionProfile.dateOfJoining || 'N/A',
         age: sectionProfile.age || 'N/A',
+        duration: sectionProfile.duration || 'N/A',
         education: sectionProfile.education || 'N/A',
         maritalStatus: sectionProfile.maritalStatus || 'N/A',
         familyType: sectionProfile.familyType || 'N/A',
         incomeRange: sectionProfile.incomeRange || 'N/A',
         designation: sectionProfile.designation || 'N/A',
+        familyLocation: sectionProfile.familyLocation || 'N/A',
       },
       medicalHistory,
       lifestylePsychosocialFactors,

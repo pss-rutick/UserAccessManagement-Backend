@@ -5,16 +5,16 @@ import { createUserInFirebase, getAllUsers, MobileUser } from "../services/userS
 const router = Router();
 
 // Create new user
-router.post("/", async (req, res) => {
-  try {
-    const userData: MobileUser = req.body;
-    const newUser = await createUserInFirebase(userData);
-    res.status(201).json(newUser);
-  } catch (err: any) {
-    console.error(err);
-    res.status(500).json({ message: err.message || "Failed to create user" });
-  }
-});
+// router.post("/", async (req, res) => {
+//   try {
+//     const userData: MobileUser = req.body;
+//     const newUser = await createUserInFirebase(userData);
+//     res.status(201).json(newUser);
+//   } catch (err: any) {
+//     console.error(err);
+//     res.status(500).json({ message: err.message || "Failed to create user" });
+//   }
+// });
 
 // Get all users
 router.get("/", async (req, res) => {
