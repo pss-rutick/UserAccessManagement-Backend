@@ -9,20 +9,33 @@ COPY src ./src
 # COPY serviceAccountKey.json ./  # not needed in builder for compile
 RUN npx tsc
 
-# --- runner ---
-FROM node:18-alpine AS runner
+# Backend Dockerfile
+FROM node:18-alpine
+
+# Set working directory
 WORKDIR /app
-ENV NODE_ENV=production
+
+# Copy package files
 COPY package*.json ./
-RUN npm ci --omit=dev
-# Only copy built artifacts
-COPY --from=builder /app/dist ./dist
-# Copy runtime assets (env, service account, etc.)
-COPY serviceAccountKey.json ./serviceAccountKey.json
+
+# Install dependencies
+RUN npm ci
+
+# Copy source code
+COPY . .
+
+# Copy Firebase service account key
+COPY serviceAccountKey.json ./
+
+# Build TypeScript
+RUN npm run build
+# Expose port
 EXPOSE 5000
-# Install curl for HEALTHCHECK on Alpine
-RUN apk add --no-cache curl
+
+# Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD curl -fsS http://localhost:5000/health || exit 1
-CMD ["node", "dist/server.js"]
+  CMD curl -f http://localhost:5000/health || exit 1
+
+# Start the application
+CMD ["npm", "start"]
 

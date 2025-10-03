@@ -20,6 +20,9 @@ import adminActionsRoute from './routes/adminActions';
 import profileRoutes from './routes/user-profile/PersonalDetailsContent';
 import dashboardRoutes from './routes/dashboardRoutes';
 import userProfileRouter from './routes/user-profile/userProfile';
+import day0Router from './routes/user-profile/Day0';
+import day13Router from './routes/user-profile/Day13';
+import day28Router from './routes/user-profile/Day28';
 
 const app = express();
 
@@ -84,6 +87,9 @@ app.use('/api', profileRoutes);
 app.use("/api", adminActionsRoute);
 app.use('/api', dashboardRoutes);
 app.use('/api', userProfileRouter); 
+app.use('/api/user-profile', day0Router);
+app.use('/api/user-profile', day13Router);
+app.use('/api/user-profile', day28Router);
 
 // ---------------------- Global Error Handler ----------------------
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
