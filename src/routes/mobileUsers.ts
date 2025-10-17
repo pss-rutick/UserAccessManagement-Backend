@@ -1,8 +1,8 @@
 // src/routes/mobileUsers.ts
-import { Router } from "express";
-import { createUserInFirebase, getAllUsers, MobileUser } from "../services/userService";
+// import { Router } from "express";
+// import { createUserInFirebase, getAllUsers, MobileUser } from "../services/userService";
 
-const router = Router();
+// const router = Router();
 
 // Create new user
 // router.post("/", async (req, res) => {
@@ -17,15 +17,15 @@ const router = Router();
 // });
 
 // Get all users
-router.get("/", async (req, res) => {
-  try {
-    const search = req.query.search as string | undefined;
-    const users = await getAllUsers(search);
-    res.json({ users }); // Return in { users: [...] } format
-  } catch (err: any) {
-    console.error(err);
-    res.status(500).json({ message: err.message || "Failed to fetch users" });
-  }
-});
+// router.get("/", async (req, res) => {
+//   try {
+//     const search = req.query.search as string | undefined;
+//     const users = await getAllUsers(search);
+//     res.json({ users }); // Return in { users: [...] } format
+//   } catch (err: any) {
+//     console.error(err);
+//     res.status(500).json({ message: err.message || "Failed to fetch users" });
+//   }
+// });
 
-export default router;
+// export default router;

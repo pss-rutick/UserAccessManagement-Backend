@@ -8,17 +8,17 @@ import "dotenv/config";
 import { db } from "./firebase";
 
 // Routers
-import statsRouter from './routes/stats';
+// import statsRouter from './routes/stats';
 import usersRouter from './routes/users';
 import activitiesRouter from './routes/activities';
-import notificationsRouter from './routes/notifications';
-import dashboardRouter from './routes/dashboard';
+// import notificationsRouter from './routes/notifications';
+// import dashboardRouter from './routes/dashboard';
 import authRouter from './routes/auth';
 import adminsRouter from './routes/admins';
 import listUsersRouter from './routes/listUsers';
 import adminActionsRoute from './routes/adminActions';
 import profileRoutes from './routes/user-profile/PersonalDetailsContent';
-import dashboardRoutes from './routes/dashboardRoutes';
+// import dashboardRoutes from './routes/dashboardRoutes';
 import userProfileRouter from './routes/user-profile/userProfile';
 import day0Router from './routes/user-profile/Day0';
 import day13Router from './routes/user-profile/Day13';
@@ -76,16 +76,16 @@ app.get("/health", async (req: Request, res: Response) => {
 
 // ---------------------- API Routes ----------------------
 app.use("/api", authRouter);
-app.use("/api/dashboard", dashboardRouter);
-app.use("/api/stats", statsRouter);
+// app.use("/api/dashboard", dashboardRouter);
+// app.use("/api/stats", statsRouter);
 app.use("/api/mobile-users", usersRouter);
 app.use("/api/activities", activitiesRouter);
-app.use("/api/notifications", notificationsRouter);
+// app.use("/api/notifications", notificationsRouter);
 app.use("/api/admins", adminsRouter);
 app.use("/api", listUsersRouter);
 app.use('/api', profileRoutes);
 app.use("/api", adminActionsRoute);
-app.use('/api', dashboardRoutes);
+// app.use('/api', dashboardRoutes);
 app.use('/api', userProfileRouter); 
 app.use('/api/user-profile', day0Router);
 app.use('/api/user-profile', day13Router);
